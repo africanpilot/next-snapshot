@@ -5,13 +5,26 @@ from disk — double-click, `file://`, network off — and still behaves like th
 app: client components run, links and router navigation work, selects and tabs
 work, and every page shows the data it showed when captured.
 
+## Install
+
+Requires **Node 22+** and **Google Chrome** (or any Chromium — see `browser`
+below). It is not on npm yet; until it is, run it from a clone:
+
 ```bash
-npm install                                   # playwright-core + esbuild, once
+git clone https://github.com/africanpilot/next-snapshot
+cd next-snapshot && npm ci
 node cli.mjs all --config examples/basic.config.mjs --screens
 open examples/out/my-app.html
 ```
 
-Requires Node 20+ and Google Chrome (or any Chromium — see `browser` below).
+Write a config for your app (start from `examples/basic.config.mjs`), then:
+
+```bash
+node cli.mjs all     --config my-app.config.mjs   # capture, bundle, verify
+node cli.mjs capture --config my-app.config.mjs   # crawl the app (starts it if configured)
+node cli.mjs bundle  --config my-app.config.mjs   # capture dir -> one .html
+node cli.mjs verify  --config my-app.config.mjs   # open the .html offline, check it
+```
 
 `verify` checks a sample — two URLs per route per variant — unless given
 `--full`. `--screens` saves a screenshot of each page it checks.
@@ -111,6 +124,18 @@ A config is an ES module; relative paths resolve against it.
 - **Other frameworks.** Nothing here is Next-specific except the RSC fallback
   and the `.next/static` default; a plain SPA or a Remix/Nuxt app should capture,
   but only Next App Router is tested.
+
+## Security
+
+A config is code: `app.build`, `app.start`, `login` hooks and `explore.custom`
+run with your privileges. A snapshot contains every page it captured, for every
+variant — treat it like access to the app. See [SECURITY.md](SECURITY.md),
+including how to report a vulnerability.
+
+## Development
+
+`npm test` runs the unit and end-to-end suites; `npm run test:next` snapshots a
+real Next.js app. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
