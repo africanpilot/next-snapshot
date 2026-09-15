@@ -1,0 +1,9 @@
+/* A relative url(): resolved against this file, not the page. */
+body {
+  font-family: system-ui, sans-serif;
+  margin: 24px;
+  background: url(bg.svg) no-repeat top right;
+}
+#tabs button {
+  margin-right: 4px;
+}

@@ -1,0 +1,14 @@
+{
+  "name": "next-snapshot-fixture-next-app",
+  "private": true,
+  "description": "A minimal Next.js App Router app that `npm run test:next` snapshots. Exact versions: this is a known app, not a dependency.",
+  "scripts": {
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "16.2.11",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  }
+}
