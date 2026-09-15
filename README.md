@@ -1,4 +1,4 @@
-# next-offline
+# next-snapshot
 
 Capture a running Next.js app and bundle it into **one HTML file** that opens
 from disk — double-click, `file://`, network off — and still behaves like the

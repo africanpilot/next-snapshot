@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// next-offline — capture a running Next.js app and bundle it into one HTML file
+// next-snapshot — capture a running Next.js app and bundle it into one HTML file
 // that opens from disk with no network.
 //
 //   node cli.mjs all     --config app.config.mjs   capture, bundle, verify
@@ -35,7 +35,7 @@ const { values, positionals } = parseArgs({
 const cmd = positionals[0] ?? "all";
 if (values.help || !["all", "capture", "bundle", "verify"].includes(cmd)) {
   console.log(
-    "usage: next-offline [all|capture|bundle|verify] --config app.config.mjs [--build] [--screens] [--limit N] [--variant ID] [--no-verify]",
+    "usage: next-snapshot [all|capture|bundle|verify] --config app.config.mjs [--build] [--screens] [--full] [--limit N] [--variant ID] [--no-verify]",
   );
   process.exit(values.help ? 0 : 2);
 }
@@ -54,7 +54,7 @@ try {
     if (r.failed || r.leaks || r.clickFailures) process.exitCode = 1;
   }
 } catch (e) {
-  console.error(`\nnext-offline: ${e.message}`);
+  console.error(`\nnext-snapshot: ${e.message}`);
   if (process.env.DEBUG) console.error(e.stack);
   process.exit(1);
 }
