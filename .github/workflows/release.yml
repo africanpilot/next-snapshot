@@ -47,9 +47,10 @@ jobs:
       # publisher for a package that already exists), and a re-run must not fail.
       - name: Publish, unless this version is already on npm
         run: |
+          n=$(node -p 'require("./package.json").name')
           v=$(node -p 'require("./package.json").version')
-          if npm view "next-snapshot@$v" version > /dev/null 2>&1; then
-            echo "next-snapshot@$v is already on npm; skipping publish."
+          if npm view "$n@$v" version > /dev/null 2>&1; then
+            echo "$n@$v is already on npm; skipping publish."
           else
             npm publish
           fi

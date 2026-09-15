@@ -8,22 +8,29 @@ work, and every page shows the data it showed when captured.
 ## Install
 
 Requires **Node 22+** and **Google Chrome** (or any Chromium — see `browser`
-below). It is not on npm yet; until it is, run it from a clone:
+below). Run it without installing:
 
 ```bash
-git clone https://github.com/africanpilot/next-snapshot
-cd next-snapshot && npm ci
-node cli.mjs all --config examples/basic.config.mjs --screens
-open examples/out/my-app.html
+npx @africanpilot/next-snapshot all --config my-app.config.mjs --screens
 ```
 
-Write a config for your app (start from `examples/basic.config.mjs`), then:
+or add it to a project, where the command is `next-snapshot`:
 
 ```bash
-node cli.mjs all     --config my-app.config.mjs   # capture, bundle, verify
-node cli.mjs capture --config my-app.config.mjs   # crawl the app (starts it if configured)
-node cli.mjs bundle  --config my-app.config.mjs   # capture dir -> one .html
-node cli.mjs verify  --config my-app.config.mjs   # open the .html offline, check it
+npm install --save-dev @africanpilot/next-snapshot
+npx next-snapshot all --config my-app.config.mjs
+```
+
+Write a config for your app, starting from
+[`examples/basic.config.mjs`](https://github.com/africanpilot/next-snapshot/blob/main/examples/basic.config.mjs)
+(or [`roles.config.mjs`](https://github.com/africanpilot/next-snapshot/blob/main/examples/roles.config.mjs)
+for an app with sign-in). The commands:
+
+```bash
+next-snapshot all     --config my-app.config.mjs   # capture, bundle, verify
+next-snapshot capture --config my-app.config.mjs   # crawl the app (starts it if configured)
+next-snapshot bundle  --config my-app.config.mjs   # capture dir -> one .html
+next-snapshot verify  --config my-app.config.mjs   # open the .html offline, check it
 ```
 
 `verify` checks a sample — two URLs per route per variant — unless given

@@ -1,5 +1,5 @@
 {
-  "name": "next-snapshot",
+  "name": "@africanpilot/next-snapshot",
   "version": "0.1.0",
   "description": "Capture a running Next.js app and bundle it into one self-contained, offline HTML file.",
   "keywords": [
