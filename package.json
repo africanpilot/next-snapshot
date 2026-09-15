@@ -4,9 +4,21 @@
   "private": true,
   "description": "Capture a running Next.js app and bundle it into one self-contained, offline HTML file.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/africanpilot/next-snapshot.git"
+  },
+  "homepage": "https://github.com/africanpilot/next-snapshot#readme",
+  "bugs": {
+    "url": "https://github.com/africanpilot/next-snapshot/issues"
+  },
   "type": "module",
-  "bin": { "next-snapshot": "./cli.mjs" },
-  "engines": { "node": ">=20" },
+  "bin": {
+    "next-snapshot": "./cli.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "esbuild": "^0.25.12",
     "playwright-core": "^1.57.0"
