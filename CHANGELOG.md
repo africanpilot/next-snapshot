@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-09-15
+
 ### Added
 
 - `explore.tabs: "url"` clicks each tab on every captured page of a route,
