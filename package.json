@@ -24,7 +24,7 @@
   },
   "type": "module",
   "bin": {
-    "next-snapshot": "./cli.mjs"
+    "next-snapshot": "cli.mjs"
   },
   "exports": {
     "./package.json": "./package.json"
