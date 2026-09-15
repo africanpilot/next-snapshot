@@ -1,0 +1,14 @@
+{
+  "name": "next-offline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Capture a running Next.js app and bundle it into one self-contained, offline HTML file.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "next-offline": "./cli.mjs" },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "esbuild": "^0.25.12",
+    "playwright-core": "^1.57.0"
+  }
+}
