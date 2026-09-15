@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-09-15
+
 ### Added
 
 - `docker: { container, staticPath }` copies a containerised app's build output
