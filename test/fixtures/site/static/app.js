@@ -47,7 +47,11 @@
     // A tab that never asks the server: it only rewrites the URL.
     var b = e.target.closest("button[data-tab]");
     if (b) {
-      history.replaceState(null, "", "?tab=" + b.getAttribute("data-tab"));
+      // Keep the rest of the query, the way a real app rebuilds it: the tab is
+      // one parameter among several, not the whole address.
+      var params = new URLSearchParams(location.search);
+      params.set("tab", b.getAttribute("data-tab"));
+      history.replaceState(null, "", "?" + params.toString());
       document.getElementById("tab").textContent = b.getAttribute("data-tab");
       showWhere();
     }

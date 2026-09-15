@@ -96,7 +96,7 @@ A config is an ES module; relative paths resolve against it.
 | `variants` | one | `[{ id, label, login({context, request, origin}) }]`. One crawl per variant; the file can switch between them. |
 | `defaultVariant` | first | |
 | `explore.selects` | `true` | Try each option of each visible `<select>` once per page path. |
-| `explore.tabs` | `true` | Click each tab-like control once per page path: `[role=tab]`, and "button bars" — an element whose children are two or more buttons and nothing else. A URL the click writes (router push/replace, or a bare `history.replaceState`) is captured. |
+| `explore.tabs` | `true` | Click each tab-like control and capture the URL it writes (router push/replace, or a bare `history.replaceState`). Candidates: `[role=tab]`, and "button bars" — an element whose children are two or more buttons and nothing else. `true` clicks each once per page **path**; `"url"` clicks each once per captured **page**, so a route whose pages differ by query (`?programme=…`) gets every tab for every one of them. `"url"` multiplies that route's pages by the number of tabs — use it when clicking through the app moves between a tab and a query at the same time. |
 | `explore.click` | `[]` | Extra CSS selectors to click the same way. |
 | `explore.denyText` | sign out, delete, approve, submit, save… | Controls whose label matches are never clicked. Writes are blocked at the network anyway; this protects the session and client-side state. |
 | `explore.custom` | — | `async ({page, key, variant, discover}) => {}` for app-specific discovery (clicking tabs that change the URL, etc). |
@@ -117,7 +117,9 @@ A config is an ES module; relative paths resolve against it.
   remembered, and returning to it re-serves the page it came from at that URL.
 - **Exploration is one option at a time.** Each select option and each tab is
   tried once per page path, from the first URL of that path the crawl reached —
-  not every combination. Seed the combinations you need.
+  not every combination. `explore.tabs: "url"` covers the common case (every
+  tab of every page of a route); for anything else, seed the combinations you
+  need. A URL that was never captured shows a "not in this snapshot" page.
 - **Writes.** Forms and fetches that POST/PUT/DELETE are refused unless an
   `offline.post` handler emulates them. Server Actions fail the same way.
 - **Soft navigation.** Every navigation is a full page boot, so in-memory client

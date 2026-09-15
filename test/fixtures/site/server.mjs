@@ -45,7 +45,7 @@ const HOME = page(
 <div id="tabs"><button data-tab="a">Tab A</button><button data-tab="b">Tab B</button></div>
 <p>tab: <span id="tab">none</span></p>
 <p><button id="note">Add a note to the URL</button></p>
-<select id="period"><option value="q1">Q1</option><option value="q2">Q2</option></select>
+<select id="period"><option value="q1">Q1</option><option value="q2">Q2</option><option value="q3">Q3</option></select>
 <form method="post" action="/api/save"><input name="note" value="hello"><button type="submit">Save</button></form>
 <script type="application/json" id="payload">{"html":"<img src=\\"/static/not-a-reference.svg\\">"}</script>`,
 );
@@ -77,9 +77,19 @@ export function startFixture() {
       res.writeHead(307, { location: "/about" });
       return res.end();
     }
+    // Tabs here too, so a route with several pages (one per period) shows the
+    // difference between clicking tabs once per path and once per page.
     if (u.pathname === "/report") {
       const p = (u.searchParams.get("period") ?? "none").replace(/[^a-z0-9]/gi, "");
-      return html(200, page(`Report ${p}`, `<h1>Report ${p}</h1>`));
+      return html(
+        200,
+        page(
+          `Report ${p}`,
+          `<h1>Report ${p}</h1>
+<div id="tabs"><button data-tab="a">Tab A</button><button data-tab="b">Tab B</button></div>
+<p>tab: <span id="tab">none</span></p>`,
+        ),
+      );
     }
     if (u.pathname === "/api/data") {
       res.writeHead(200, { "content-type": "application/json" });

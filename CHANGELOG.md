@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `explore.tabs: "url"` clicks each tab on every captured page of a route,
+  rather than once per route. Without it, a route whose pages differ by query
+  (a programme picker, say) holds tab views only for the first of them, so
+  clicking from a list straight into another page's tab lands on "not in this
+  snapshot". Pages a tab click produced are not explored again, so the cost is
+  one pass per page rather than a combinatorial one.
+
 ## [0.1.0] — 2026-09-15
 
 First release.
