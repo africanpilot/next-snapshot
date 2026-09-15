@@ -43,7 +43,16 @@ jobs:
         run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
       - run: npm ci --ignore-scripts
       - run: npm test
-      - run: npm publish
+      # Idempotent: the first version is published by hand (npm can only trust a
+      # publisher for a package that already exists), and a re-run must not fail.
+      - name: Publish, unless this version is already on npm
+        run: |
+          v=$(node -p 'require("./package.json").version')
+          if npm view "next-snapshot@$v" version > /dev/null 2>&1; then
+            echo "next-snapshot@$v is already on npm; skipping publish."
+          else
+            npm publish
+          fi
 
   github-release:
     needs: publish

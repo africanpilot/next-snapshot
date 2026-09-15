@@ -6,7 +6,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-First release. Nothing has been published to npm yet.
+## [0.1.0] — 2026-09-15
+
+First release.
 
 ### Added
 
