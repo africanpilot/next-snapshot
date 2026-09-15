@@ -86,7 +86,8 @@ A config is an ES module; relative paths resolve against it.
 |---|---|---|
 | `app.cwd`, `app.start`, `app.build`, `app.port` | — | How to run the app. `{port}` is substituted into `start`. `build` runs when there is no `.next/BUILD_ID`, or with `--build`. Omit `app` and set `url` to capture a server you started yourself. |
 | `url` | `http://localhost:{port}` | Origin to capture. `localhost`, because Next builds redirect URLs on it and a session cookie set on `127.0.0.1` is not sent to `localhost`. |
-| `aliases` | loopback spellings | Other origins that are the same app (a canonical host it redirects to); URLs on them are treated as the app's own. `localhost`, `127.0.0.1` and `[::1]` are always aliases of each other. |
+| `aliases` | loopback spellings | Other origins that are the same app (a canonical host it redirects to); URLs on them are treated as the app's own. `localhost`, `127.0.0.1`, `[::1]` and `0.0.0.0` on the same port are always aliases of each other. |
+| `docker` | — | `{ container, staticPath }` — the app runs in a container, so copy its build output here with `docker cp` before bundling. `staticPath` defaults to `/app/.next/static`. See [Docker](#an-app-running-in-docker). |
 | `out` | `./<name>.html` | Output file. The capture directory, bundle report, verify report and screenshots sit next to it. |
 | `title` | — | Title shown while the file opens. |
 | `start` | `/` | Page to open when the file has no hash. |
@@ -107,6 +108,32 @@ A config is an ES module; relative paths resolve against it.
 | `offline.switcher` | `true` | A variant `<select>` in the badge. |
 | `includeStatic` | `true` | Also embed every file under `.next/static`, so lazily-loaded chunks the crawl never triggered are present. |
 | `viewport`, `locale`, `timezoneId`, `browser` | | Passed to Chrome. `browser.executablePath` if Chrome is not installed. |
+
+## An app running in Docker
+
+The tool drives Chrome on your machine, so it reaches the container the same way
+your browser does. Start the app with its port published — `docker run -p
+3000:3000 …`, or `ports: ["3000:3000"]` in compose — and point `url` at it:
+
+```js
+export default {
+  name: "my-app",
+  url: "http://localhost:3000",
+  docker: { container: "my-app" },   // `docker ps` shows the name
+  seeds: ["/"],
+};
+```
+
+`docker` copies the build output out of the container with `docker cp`, so
+chunks that only load later — a modal, a menu — are in the file too. Without it
+the snapshot holds only what the crawl happened to load. If your image puts the
+app somewhere other than `/app`, set `staticPath` to match. A failed copy is a
+warning, not an error: the capture continues without it.
+
+Redirects to `0.0.0.0` need nothing extra. Next's images set
+`HOSTNAME=0.0.0.0`, and an app that builds absolute URLs from it redirects
+there; `0.0.0.0` on the same port is already an alias of the origin. For any
+other host it redirects to, add it to `aliases`.
 
 ## What it cannot do
 

@@ -48,5 +48,17 @@ does for someone snapshotting their app, not only what it does to the code.
 1. Move the `Unreleased` notes in `CHANGELOG.md` under the new version.
 2. `npm version patch|minor` — bumps, commits and tags.
 3. `git push --follow-tags` — the `v*` tag runs `.github/workflows/release.yml`,
-   which tests, publishes to npm with provenance via trusted publishing, and
-   creates the GitHub release.
+   which tests and **stages** the version on npm with provenance, through
+   trusted publishing. Staged means it exists in the registry but nobody can
+   install it.
+4. Approve it, which is what publishes it:
+   ```bash
+   npm stage list                 # find the stage id
+   npm stage view <stage-id>      # what is in it
+   npm stage approve <stage-id>   # asks for your passkey; now it is live
+   ```
+   `npm stage reject <stage-id>` throws it away instead.
+
+The approval step is deliberate: no token and no workflow can publish a version
+on its own — a person has to be present. Run it in a real terminal, since the
+passkey prompt needs one.

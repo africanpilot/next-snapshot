@@ -3,10 +3,14 @@ name: Release
 # A version tag publishes to npm. Trusted publishing (OIDC): no npm token exists
 # anywhere, and provenance links the published version to this workflow run.
 #
+# CI only *stages* the version; you approve it with your passkey, which is what
+# publishes it. See the "Releasing" section of CONTRIBUTING.md.
+#
 # One-time setup on npmjs.com, after the first manual publish of the package:
 #   Package → Settings → Trusted Publisher → GitHub Actions
 #     owner: africanpilot   repository: next-snapshot
 #     workflow: release.yml   environment: npm
+#     permission: npm stage publish
 #   Package → Settings → Publishing access →
 #     "Require two-factor authentication and disallow tokens"
 # And in this repository: Settings → Environments → "npm", restricted to v* tags.
@@ -43,16 +47,23 @@ jobs:
         run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
       - run: npm ci --ignore-scripts
       - run: npm test
-      # Idempotent: the first version is published by hand (npm can only trust a
-      # publisher for a package that already exists), and a re-run must not fail.
-      - name: Publish, unless this version is already on npm
+      # Staged publishing: CI packs the version and puts it in the registry
+      # where nobody can install it yet. A human then approves it with 2FA
+      # (`npm stage list` / `npm stage approve <id>`), which is what actually
+      # publishes. A compromised workflow cannot ship a release on its own.
+      #
+      # Idempotent: the first version was published by hand (npm can only trust
+      # a publisher for a package that already exists), and a re-run must not
+      # fail on a version that is already out.
+      - name: Stage the release, unless this version is already on npm
         run: |
           n=$(node -p 'require("./package.json").name')
           v=$(node -p 'require("./package.json").version')
           if npm view "$n@$v" version > /dev/null 2>&1; then
-            echo "$n@$v is already on npm; skipping publish."
+            echo "$n@$v is already on npm; nothing to stage."
           else
-            npm publish
+            npm stage publish
+            echo "Staged $n@$v. Approve it with: npm stage list && npm stage approve <stage-id>"
           fi
 
   github-release:

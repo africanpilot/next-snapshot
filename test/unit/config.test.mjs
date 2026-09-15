@@ -21,7 +21,8 @@ test("an empty config gets every default", async () => {
   const c = await loadConfig(file);
   assert.equal(c.name, "app");
   assert.equal(c.origin, "http://localhost:3217");
-  assert.deepEqual(c.aliases, ["http://127.0.0.1:3217", "http://[::1]:3217"]);
+  assert.deepEqual(c.aliases, ["http://127.0.0.1:3217", "http://[::1]:3217", "http://0.0.0.0:3217"]);
+  assert.equal(c.docker, null);
   assert.equal(c.out, path.join(dir, "app.html"));
   assert.equal(c.captureDir, path.join(dir, "app.capture"));
   assert.deepEqual(c.seeds, ["/"]);
@@ -57,6 +58,21 @@ test("a url sets the origin; a non-loopback host gets only the aliases it is giv
   const c = await loadConfig(file);
   assert.equal(c.origin, "https://app.example.com");
   assert.deepEqual(c.aliases, ["https://www.app.example.com"]);
+});
+
+test("every loopback spelling of the app's origin is an alias of it", async () => {
+  // A Next image sets HOSTNAME=0.0.0.0, so its redirects can name that host.
+  const { file } = await writeConfig(`export default { url: "http://localhost:3000" };`);
+  const c = await loadConfig(file);
+  assert.deepEqual(c.aliases, ["http://127.0.0.1:3000", "http://[::1]:3000", "http://0.0.0.0:3000"]);
+});
+
+test("docker only needs a container name; the build path has a default", async () => {
+  const { file } = await writeConfig(`export default { docker: { container: "web" } };`);
+  const c = await loadConfig(file);
+  assert.deepEqual(c.docker, { container: "web", staticPath: "/app/.next/static" });
+  const other = await writeConfig(`export default { docker: { container: "web", staticPath: "/srv/.next/static" } };`);
+  assert.equal((await loadConfig(other.file)).docker.staticPath, "/srv/.next/static");
 });
 
 test("variant labels default to their ids", async () => {

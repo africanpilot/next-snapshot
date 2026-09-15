@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `docker: { container, staticPath }` copies a containerised app's build output
+  out with `docker cp` before bundling, so chunks that load later are in the
+  file. A failed copy warns and carries on.
+- `0.0.0.0` on the app's port is now a default alias of its origin, alongside
+  `localhost`, `127.0.0.1` and `[::1]`. Next's Docker images set
+  `HOSTNAME=0.0.0.0`, and pages an app redirects there were being treated as
+  another site.
+
+### Changed
+
+- "Nothing is answering at …" now also says to publish the port when the app
+  runs in Docker.
+- Releases are staged rather than published by CI: the workflow runs
+  `npm stage publish`, and a maintainer approves it with 2FA. No workflow and
+  no token can ship a version without a person present.
+
 ## [0.1.1] — 2026-09-15
 
 ### Added
