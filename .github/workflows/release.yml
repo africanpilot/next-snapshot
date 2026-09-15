@@ -1,0 +1,56 @@
+name: Release
+
+# A version tag publishes to npm. Trusted publishing (OIDC): no npm token exists
+# anywhere, and provenance links the published version to this workflow run.
+#
+# One-time setup on npmjs.com, after the first manual publish of the package:
+#   Package → Settings → Trusted Publisher → GitHub Actions
+#     owner: africanpilot   repository: next-snapshot
+#     workflow: release.yml   environment: npm
+#   Package → Settings → Publishing access →
+#     "Require two-factor authentication and disallow tokens"
+# And in this repository: Settings → Environments → "npm", restricted to v* tags.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write # the OIDC token npm trusts, and the provenance signature
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: npm is new enough for trusted publishing (>= 11.5.1)
+        run: |
+          npm --version
+          node -e 'const [a,b,c]=process.argv[1].split(".").map(Number); process.exit(a>11||(a===11&&(b>5||(b===5&&c>=1)))?0:1)' "$(npm --version)" \
+            || npm install -g npm@11
+      - name: The tag matches package.json
+        run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npm publish
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -3,6 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "description": "Capture a running Next.js app and bundle it into one self-contained, offline HTML file.",
+  "keywords": [
+    "nextjs",
+    "next",
+    "offline",
+    "snapshot",
+    "single-file",
+    "html",
+    "static",
+    "playwright",
+    "cli"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,11 +27,29 @@
   "bin": {
     "next-snapshot": "./cli.mjs"
   },
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "cli.mjs",
+    "lib/"
+  ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"test/unit/*.test.mjs\" \"test/e2e/*.test.mjs\"",
+    "test:unit": "node --test \"test/unit/*.test.mjs\"",
+    "test:e2e": "node --test \"test/e2e/*.test.mjs\"",
+    "test:next": "node --test \"test/next/*.test.mjs\"",
+    "prepublishOnly": "npm test && npm pack --dry-run"
   },
   "dependencies": {
-    "esbuild": "^0.25.12",
-    "playwright-core": "^1.57.0"
+    "esbuild": "^0.28.2",
+    "playwright-core": "~1.63.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

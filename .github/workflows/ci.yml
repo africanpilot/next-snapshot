@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: nothing here writes to the repository.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, node ${{ matrix.node }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      # No dependency install scripts. esbuild's binary arrives through its
+      # optional dependencies and its JS API works without the postinstall.
+      - run: npm ci --ignore-scripts
+      - run: npm audit signatures
+      - run: npm run test:unit
+      # Uses the runner's installed Google Chrome.
+      - run: npm run test:e2e
+      - name: The tarball holds only what it should
+        shell: bash
+        run: |
+          npm pack --dry-run --json > pack.json
+          node -e '
+            const files = require("./pack.json")[0].files.map((f) => f.path);
+            const ok = /^(cli\.mjs|lib\/.+|README\.md|LICENSE|package\.json)$/;
+            const bad = files.filter((f) => !ok.test(f));
+            console.log(files.join("\n"));
+            if (bad.length) { console.error("unexpected in tarball:", bad); process.exit(1); }
+          '
+
+  next:
+    name: real Next.js app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run test:next
