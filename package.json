@@ -1,6 +1,6 @@
 {
   "name": "@africanpilot/next-snapshot",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Capture a running Next.js app and bundle it into one self-contained, offline HTML file.",
   "keywords": [
     "nextjs",
