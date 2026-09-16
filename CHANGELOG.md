@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `compress: "zstd"` packs pages into clusters — sorted by route, compressed as
+  one stream each — instead of gzipping every page on its own. Pages of an app
+  repeat each other and gzip's 32KB window cannot see past one page, so a big
+  app paid for its layout once per page. Measured on a 260-page report app:
+  12.4 MB to about 2 MB. Costs an 8 KB inlined decoder (fzstd) and tens of
+  milliseconds for the first page of each cluster; `clusterBytes` (4 MB by
+  default) trades size against that. The default stays `"gzip"`, which is
+  unchanged and needs no decoder.
+
 ## [0.1.2] — 2026-09-15
 
 ### Added

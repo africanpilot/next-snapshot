@@ -33,6 +33,17 @@ test("an empty config gets every default", async () => {
   assert.equal(c.explore.tabs, true);
   assert.equal(c.offline.missingLinks, "show");
   assert.equal(c.offline.badge, "bottom-right");
+  assert.equal(c.compress, "gzip", "the default packing is unchanged");
+  assert.equal(c.clusterBytes, 4 * 1024 * 1024);
+});
+
+test("compress is gzip or zstd, and clusterBytes is settable", async () => {
+  const { file } = await writeConfig(`export default { compress: "zstd", clusterBytes: 1024 };`);
+  const c = await loadConfig(file);
+  assert.equal(c.compress, "zstd");
+  assert.equal(c.clusterBytes, 1024);
+  const bad = await writeConfig(`export default { compress: "brotli" };`);
+  await assert.rejects(loadConfig(bad.file), /compress must be "gzip" or "zstd"/);
 });
 
 test("/_next and /api are never crawled as pages, and user excludes add to them", async () => {

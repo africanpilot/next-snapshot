@@ -106,8 +106,39 @@ A config is an ES module; relative paths resolve against it.
 | `offline.missingLinks` | `"show"` | Links to pages the snapshot does not hold: `"show"` (they open a "not in snapshot" page), `"disable"` (dimmed, not clickable) or `"hide"`. With `include` narrowing the crawl, `"hide"` removes the nav entries for everything left out. |
 | `offline.badge` | `"bottom-right"` | The "Offline snapshot" pill; `false` to hide. |
 | `offline.switcher` | `true` | A variant `<select>` in the badge. |
+| `compress` | `"gzip"` | How pages are packed. `"gzip"` stores each page on its own, decoded by the browser itself. `"zstd"` sorts pages by route, packs them into clusters of `clusterBytes` and compresses each cluster as one stream, inlining an 8 KB decoder — far smaller for an app with many similar pages. See [Size](#size-and-compression). |
+| `clusterBytes` | 4 MB | Raw bytes of pages per cluster, with `compress: "zstd"`. Bigger is smaller, but the first page of each cluster takes longer to open. |
 | `includeStatic` | `true` | Also embed every file under `.next/static`, so lazily-loaded chunks the crawl never triggered are present. |
 | `viewport`, `locale`, `timezoneId`, `browser` | | Passed to Chrome. `browser.executablePath` if Chrome is not installed. |
+
+## Size and compression
+
+Pages of an app repeat each other: the same layout, nav and table shell, over
+and over. By default each page is gzipped on its own, which cannot exploit that
+— gzip looks only 32 KB back, and a page's near-twin is further away than that.
+For a handful of pages this costs nothing worth fixing.
+
+For an app with hundreds of pages, `compress: "zstd"` sorts pages by route,
+packs them into clusters and compresses each cluster as one stream, so the
+repetition is paid for once:
+
+```js
+export default {
+  // …
+  compress: "zstd",
+  clusterBytes: 4 * 1024 * 1024,   // the default
+};
+```
+
+On a 260-page report app, measured: **12.4 MB → about 2 MB**. The cost is an
+8 KB decoder inlined in the file, and tens of milliseconds to open the first
+page of a cluster; pages in an already-decoded cluster are free. Assets stay
+per-page gzip either way, since they are wanted all at once at startup and are
+mostly already-compressed formats.
+
+Why not brotli, which is smaller still: Chrome cannot decompress brotli from
+JavaScript (`DecompressionStream` has no brotli there, and no zstd anywhere), so
+it would mean inlining a 208 KB decoder to save about 10%.
 
 ## An app running in Docker
 
