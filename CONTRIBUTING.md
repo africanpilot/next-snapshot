@@ -36,7 +36,8 @@ that exposed it to the fixture and a test that fails without the fix.
   `lib/runtime/` run in the browser and are injected as text: keep them free of
   imports and of the character sequence that closes a `<script>` element.
 - Comments say *why*. The code says what.
-- Keep dependencies at two. A third needs a good reason.
+- Keep dependencies few: `playwright-core`, `esbuild`, `fzstd`. A fourth needs a
+  good reason.
 
 ## Pull requests
 

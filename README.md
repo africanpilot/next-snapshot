@@ -195,9 +195,12 @@ other host it redirects to, add it to `aliases`.
 ## Security
 
 A config is code: `app.build`, `app.start`, `login` hooks and `explore.custom`
-run with your privileges. A snapshot contains every page it captured, for every
-variant — treat it like access to the app. See [SECURITY.md](SECURITY.md),
-including how to report a vulnerability.
+run with your privileges. A snapshot contains every page it captured, and the
+API responses those pages fetched, for every variant — treat it like access to
+the app, and check what is in it before sharing. Replayed pages run in a
+sandboxed frame so that content the app never trusted cannot carry the snapshot
+anywhere. See [SECURITY.md](SECURITY.md), including how to report a
+vulnerability.
 
 ## Development
 
