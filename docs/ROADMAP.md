@@ -17,19 +17,40 @@ server; `main` fixes it by sandboxing the replay frame. Until that ships,
 everyone using the tool has the hole.
 **Cost:** a release. **Done when:** 0.2.1 is on npm with provenance.
 
-### 2. Make capture fast
+### 2. Make capture fast — harder than it looks
 Measured on a 273-page app: 12.5 minutes, of which **page loads were 4%**. The
-rest is the tool waiting on purpose. In order of payoff:
+rest is the tool waiting, or navigating back to where it was. That measurement
+still stands. What does not stand is the conclusion I drew from it.
 
-| Change | Saves | Risk |
-|---|---|---|
-| `settleMs` default 300 → 0 | ~155 s | Low — `networkidle` already waited for 500 ms of silence |
-| Replace `networkidle` with "the document's own requests finished, then 150 ms quiet" | ~180 s | Low–medium — needs care for apps that fetch late |
-| Don't navigate back between tab clicks (the tab strip is still there) | ~110 s | Low — only affects `explore.tabs` |
-| Crawl N pages at once, and variants in parallel | The rest | Medium — exploration needs its own page; the app must tolerate the load, so default conservatively (4?) |
+**Three changes were tried and all three were reverted**, because each changed
+*what the crawl captured*:
 
-**Done when:** that same capture is under 2 minutes and produces the same page
-set (compare manifests before and after — the page list is the test).
+| Attempt | Time | Pages | What happened |
+|---|---|---|---|
+| Baseline | 753 s | 273 | — |
+| `settleMs`→0, `quietMs` 150 instead of `networkidle`, no navigating back between tab clicks | 130 s | 195 | Lost 78 pages: whole tab families for the non-default fiscal years |
+| …with the `fromTabs` guard removed | 274 s | 170 | Captured 28 programmes for **FY2023 instead of FY2026** |
+| Only the two waiting changes | 657 s | 192 | Still the wrong year (FY2025), and barely faster |
+
+**The lesson.** None of this is "timing" in isolation. Exploration reads the
+page's current state — which tabs exist, what each select is set to, which page
+the next exploration starts from. Shortening a wait changes what the app has
+finished doing when we read it; not navigating back changes where we read it
+from. Both silently produce a *different, plausible-looking* capture. The clock
+was never the test: **the page set is**.
+
+**So, before any further speed work:**
+1. Make the page set a test. Capture RADAR twice with the same config and
+   assert identical manifests; then no change can quietly alter the result.
+2. Only then measure `settle` directly — time every call, per visit and per
+   explored option — rather than inferring the total by arithmetic, which is
+   how I got a ~415 s estimate that the runs did not bear out.
+3. Treat concurrency as the same class of risk, not an exception: parallel
+   pages would share exactly the state that broke here, so each would need its
+   own context, and the page set must be identical afterwards.
+
+**Done when:** a capture is meaningfully faster **and** its manifest matches the
+baseline key for key.
 
 ### 3. Make a big snapshot navigable
 273 pages and the only way through them is whatever the app links to.
