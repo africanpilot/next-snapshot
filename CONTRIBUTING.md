@@ -39,6 +39,12 @@ that exposed it to the fixture and a test that fails without the fix.
 - Keep dependencies few: `playwright-core`, `esbuild`, `fzstd`. A fourth needs a
   good reason.
 
+## What to work on
+
+[docs/ROADMAP.md](docs/ROADMAP.md) lists what's worth doing, in rough order,
+with what each would cost and how we'd know it worked — plus the things that
+were considered and ruled out, so nobody re-derives them.
+
 ## Pull requests
 
 One change per pull request, with tests. CI must pass. Describe what the change

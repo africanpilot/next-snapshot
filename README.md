@@ -205,7 +205,8 @@ vulnerability.
 ## Development
 
 `npm test` runs the unit and end-to-end suites; `npm run test:next` snapshots a
-real Next.js app. See [CONTRIBUTING.md](CONTRIBUTING.md).
+real Next.js app. See [CONTRIBUTING.md](CONTRIBUTING.md). What might come next,
+and what was deliberately ruled out, is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## License
 
