@@ -6,6 +6,52 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-09-16
+
+### Security
+
+- **A captured page could carry the whole snapshot to a server.** Content an app
+  rendered but never trusted — a comment field, a hostile API value — runs as an
+  inline script in the replay frame, which is same-origin with the shell. It
+  could read every variant's pages and leave with them via `window.open` or
+  `top.location`; no CSP directive restricts top-level navigation, so the policy
+  never covered it. The frame is now sandboxed (`allow-scripts
+  allow-same-origin allow-forms allow-modals`): same-origin stays, because the
+  shim needs it, but top navigation and popups do not. A link that genuinely
+  leads off-site is opened by the shell, which asks first. Anyone sharing a
+  snapshot of an app that renders user content should update.
+
+### Fixed
+
+- A page that would not decode left the file on "Opening…" for ever; it now says
+  what broke and that the file is probably incomplete.
+- `__NOA<n>__` appearing as ordinary text in a captured page destroyed the whole
+  file; unmatched tokens are left alone.
+- The runtime hardcoded `/_next/static/` where the bundler uses `staticPrefix`,
+  so an app with a `basePath` lost any chunk carrying a query.
+- A capture whose pages are all error responses reported complete success; it
+  now warns.
+- A failed background body read (a full disk, too many open files) ended the
+  crawl with no message.
+- `#__proto__:/` in the address named a variant that exists only on
+  `Object.prototype`.
+- Bundling with no capture said `ENOENT manifest.json`; it now says to run
+  `capture` first.
+- The bundle report double-counted deduplicated asset bodies.
+
+### Documentation
+
+- SECURITY.md and the README said the file "does not reach the network". It does
+  not *fetch*; navigation was never covered by the CSP, which is what the
+  sandbox now handles. Added that API response bodies are stored verbatim (a
+  token in one ships with the snapshot, while cookies and headers are not
+  stored), that "read-only" means no non-GET rather than no side effects, and
+  that there are three runtime dependencies, of which only esbuild has an
+  install script.
+- [docs/ROADMAP.md](docs/ROADMAP.md): what might come next, what was ruled out
+  and why, and three failed attempts at making capture faster — each of which
+  changed *what* the crawl captured rather than only how long it waited.
+
 ## [0.2.0] — 2026-09-16
 
 ### Added
