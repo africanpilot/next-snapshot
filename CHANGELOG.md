@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-11-21
+
 ### Fixed
 
 - Capture crashed ("No resource with given identifier found") when a page
