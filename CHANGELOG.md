@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Capture crashed ("No resource with given identifier found") when a page
+  navigated itself away right after it loaded — a script setting `location`
+  takes the response body with it. The page is now fetched again as the same
+  variant. Seen as an intermittent CI failure on macOS.
+
+### Changed
+
+- playwright-core 1.64.
+
 ## [0.2.1] — 2026-09-16
 
 ### Security
