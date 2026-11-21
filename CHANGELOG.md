@@ -12,6 +12,8 @@ All notable changes to this project are documented here. The format follows
   navigated itself away right after it loaded — a script setting `location`
   takes the response body with it. The page is now fetched again as the same
   variant. Seen as an intermittent CI failure on macOS.
+- Select exploration could miss an option's page when the app took more than
+  150 ms to change the URL; it now waits up to a second for the change.
 
 ### Changed
 
